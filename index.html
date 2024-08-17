@@ -12,12 +12,16 @@
                     this.vid = document.querySelector("#vid");
 
                     marker.addEventListener('markerFound', function () {
-                        this.toggle = true;
-                        this.vid.play();
+                        var playButton = document.getElementById('playButton');
+                        playButton.style.display = 'block';
+
+                        playButton.addEventListener('click', function () {
+                            this.vid.play();
+                            playButton.style.display = 'none';
+                        }.bind(this));
                     }.bind(this));
 
                     marker.addEventListener('markerLost', function () {
-                        this.toggle = false;
                         this.vid.pause();
                     }.bind(this));
                 },
@@ -43,8 +47,6 @@
                     loop
                     crossorigin
                     webkit-playsinline
-                    autoplay
-                    muted
                     playsinline
                 ></video>
             </a-assets>
@@ -75,5 +77,9 @@
 
             <a-entity camera></a-entity>
         </a-scene>
+
+        <button id="playButton" style="position: absolute; top: 20px; left: 20px; display: none;">
+            Play Video
+        </button>
     </body>
 </html>
