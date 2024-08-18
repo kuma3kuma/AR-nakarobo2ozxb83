@@ -2,7 +2,7 @@
 <html>
     <head>
         <meta charset="utf-8">
-        <title>AR Video Playback</title>
+        <title>AR Multi-Marker Video Playback</title>
         <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
         <script src="https://cdn.rawgit.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
         <style>
@@ -33,8 +33,17 @@
         >
             <a-assets>
                 <video
-                    id="vid"
-                    src="assets/asset.mp4"
+                    id="vid1"
+                    src="assets/asset1.mp4"
+                    preload="auto"
+                    loop
+                    playsinline
+                    webkit-playsinline
+                    crossorigin="anonymous"
+                ></video>
+                <video
+                    id="vid2"
+                    src="assets/asset2.mp4"
                     preload="auto"
                     loop
                     playsinline
@@ -43,13 +52,29 @@
                 ></video>
             </a-assets>
 
+            <!-- マーカー1 -->
             <a-marker
                 type="pattern"
-                url="assets/marker.patt"
-                id="marker"
+                url="assets/marker1.patt"
+                id="marker1"
             >
                 <a-video
-                    src="#vid"
+                    src="#vid1"
+                    width="1"
+                    height="0.6"
+                    position="0 0 0"
+                    rotation="-90 0 0"
+                ></a-video>
+            </a-marker>
+
+            <!-- マーカー2 -->
+            <a-marker
+                type="pattern"
+                url="assets/marker2.patt"
+                id="marker2"
+            >
+                <a-video
+                    src="#vid2"
                     width="1"
                     height="0.6"
                     position="0 0 0"
@@ -63,30 +88,46 @@
         <script>
             document.addEventListener('DOMContentLoaded', function () {
                 const startButton = document.getElementById('startButton');
-                const video = document.getElementById('vid');
-                const marker = document.getElementById('marker');
+                const video1 = document.getElementById('vid1');
+                const video2 = document.getElementById('vid2');
+                const marker1 = document.getElementById('marker1');
+                const marker2 = document.getElementById('marker2');
 
                 // ユーザーがスタートボタンをタップしたときの処理
                 startButton.addEventListener('click', function () {
                     // ビデオをロード
-                    video.load();
+                    video1.load();
+                    video2.load();
                     // ユーザー操作により再生を許可
-                    video.play();
-                    video.pause();
+                    video1.play();
+                    video2.play();
+                    video1.pause();
+                    video2.pause();
 
                     // スタートボタンを非表示
                     startButton.style.display = 'none';
                 });
 
-                // マーカーが検出されたときの処理
-                marker.addEventListener('markerFound', function () {
-                    video.play();
+                // マーカー1が検出されたときの処理
+                marker1.addEventListener('markerFound', function () {
+                    video1.play();
                 });
 
-                // マーカーが見失われたときの処理
-                marker.addEventListener('markerLost', function () {
-                    video.pause();
-                    video.currentTime = 0;
+                // マーカー1が見失われたときの処理
+                marker1.addEventListener('markerLost', function () {
+                    video1.pause();
+                    video1.currentTime = 0;
+                });
+
+                // マーカー2が検出されたときの処理
+                marker2.addEventListener('markerFound', function () {
+                    video2.play();
+                });
+
+                // マーカー2が見失われたときの処理
+                marker2.addEventListener('markerLost', function () {
+                    video2.pause();
+                    video2.currentTime = 0;
                 });
             });
         </script>
