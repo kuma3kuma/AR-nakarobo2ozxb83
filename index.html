@@ -2,33 +2,93 @@
 <html>
     <head>
         <meta charset="utf-8">
-        <title>AR Multi-Marker Video Playback</title>
+        <title>AR Video Playback</title>
         <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
         <script src="https://cdn.rawgit.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
+        <style>
+            #startButton {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                padding: 20px 40px;
+                font-size: 24px;
+                background-color: #007BFF;
+                color: white;
+                border: none;
+                border-radius: 5px;
+                cursor: pointer;
+                z-index: 9999;
+            }
+        </style>
     </head>
 
     <body style="margin: 0; overflow: hidden;">
+        <button id="startButton">タップして開始</button>
+
         <a-scene
             vr-mode-ui="enabled: false"
             embedded
             arjs="sourceType: webcam; debugUIEnabled: false;"
         >
             <a-assets>
-                <video id="vid1" src="assets/asset1.mp4" preload="auto" loop playsinline webkit-playsinline crossorigin="anonymous"></video>
-                <video id="vid2" src="assets/asset2.mp4" preload="auto" loop playsinline webkit-playsinline crossorigin="anonymous"></video>
+                <video
+                    id="vid"
+                    src="assets/asset.mp4"
+                    preload="auto"
+                    loop
+                    playsinline
+                    webkit-playsinline
+                    crossorigin="anonymous"
+                ></video>
             </a-assets>
 
-            <!-- マーカー1 -->
-            <a-marker type="pattern" url="assets/marker1.patt">
-                <a-video src="#vid1" width="1" height="0.6" position="0 0 0" rotation="-90 0 0"></a-video>
-            </a-marker>
-
-            <!-- マーカー2 -->
-            <a-marker type="pattern" url="assets/marker2.patt">
-                <a-video src="#vid2" width="1" height="0.6" position="0 0 0" rotation="-90 0 0"></a-video>
+            <a-marker
+                type="pattern"
+                url="assets/marker.patt"
+                id="marker"
+            >
+                <a-video
+                    src="#vid"
+                    width="1"
+                    height="0.6"
+                    position="0 0 0"
+                    rotation="-90 0 0"
+                ></a-video>
             </a-marker>
 
             <a-entity camera></a-entity>
         </a-scene>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const startButton = document.getElementById('startButton');
+                const video = document.getElementById('vid');
+                const marker = document.getElementById('marker');
+
+                // ユーザーがスタートボタンをタップしたときの処理
+                startButton.addEventListener('click', function () {
+                    // ビデオをロード
+                    video.load();
+                    // ユーザー操作により再生を許可
+                    video.play();
+                    video.pause();
+
+                    // スタートボタンを非表示
+                    startButton.style.display = 'none';
+                });
+
+                // マーカーが検出されたときの処理
+                marker.addEventListener('markerFound', function () {
+                    video.play();
+                });
+
+                // マーカーが見失われたときの処理
+                marker.addEventListener('markerLost', function () {
+                    video.pause();
+                    video.currentTime = 0;
+                });
+            });
+        </script>
     </body>
 </html>
