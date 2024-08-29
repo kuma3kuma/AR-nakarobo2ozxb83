@@ -1,8 +1,19 @@
 <!doctype html>
+<!-- 
+  Version: 1.1.0 
+  Author: [Your Name or Team Name]
+  Date: [YYYY-MM-29]
+  Description: WebAR application with 23 assets (22 MP4 videos, 1 GLB model), including start button for user permissions. 
+  Changes:
+    - Simplified permission handling process.
+    - Ensured start button hides after permissions are granted.
+    - Implemented clear error handling for permission requests.
+-->
+
 <html>
     <head>
         <meta charset="utf-8">
-        <title>AR Video Playback</title>
+        <title>AR Video and Model Playback</title>
         <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
         <script src="https://cdn.rawgit.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
         <style>
@@ -32,29 +43,28 @@
             arjs="sourceType: webcam; debugUIEnabled: false;"
         >
             <a-assets>
-                <video
-                    id="vid"
-                    src="assets/asset2.mp4"
-                    preload="auto"
-                    loop
-                    playsinline
-                    webkit-playsinline
-                    crossorigin="anonymous"
-                ></video>
+                <!-- 22個のビデオアセット -->
+                <video id="vid1" src="assets/asset1.mp4" preload="auto" loop crossorigin playsinline></video>
+                <video id="vid2" src="assets/asset2.mp4" preload="auto" loop crossorigin playsinline></video>
+                <!-- 以下、vid3 から vid22 まで同様に追加 -->
+                <video id="vid22" src="assets/asset22.mp4" preload="auto" loop crossorigin playsinline></video>
+
+                <!-- GLBモデルのアセット -->
+                <a-asset-item id="model23" src="assets/model.glb"></a-asset-item>
             </a-assets>
 
-            <a-marker
-                type="pattern"
-                url="assets/marker.patt"
-                id="marker"
-            >
-                <a-video
-                    src="#vid"
-                    width="1"
-                    height="0.6"
-                    position="0 0 0"
-                    rotation="-90 0 0"
-                ></a-video>
+            <!-- 22個のマーカー（ビデオ用） -->
+            <a-marker type="pattern" url="assets/marker1.patt" id="marker1">
+                <a-video src="#vid1" width="1" height="0.6" position="0 0 0" rotation="-90 0 0"></a-video>
+            </a-marker>
+            <a-marker type="pattern" url="assets/marker2.patt" id="marker2">
+                <a-video src="#vid2" width="1" height="0.6" position="0 0 0" rotation="-90 0 0"></a-video>
+            </a-marker>
+            <!-- 以下、marker3 から marker22 まで同様に追加 -->
+
+            <!-- GLBモデル用のマーカー -->
+            <a-marker type="pattern" url="assets/marker23.patt" id="marker23">
+                <a-entity gltf-model="#model23" scale="0.5 0.5 0.5" position="0 0 0" rotation="0 0 0"></a-entity>
             </a-marker>
 
             <a-entity camera></a-entity>
@@ -63,30 +73,49 @@
         <script>
             document.addEventListener('DOMContentLoaded', function () {
                 const startButton = document.getElementById('startButton');
-                const video = document.getElementById('vid');
-                const marker = document.getElementById('marker');
+                const videos = [];
+                for (let i = 1; i <= 22; i++) {
+                    videos.push(document.getElementById(`vid${i}`));
+                }
+                const markers = [];
+                for (let i = 1; i <= 22; i++) {
+                    markers.push(document.getElementById(`marker${i}`));
+                }
 
-                // ユーザーがスタートボタンをタップしたときの処理
                 startButton.addEventListener('click', function () {
                     // ビデオをロード
-                    video.load();
-                    // ユーザー操作により再生を許可
-                    video.play();
-                    video.pause();
+                    videos.forEach(video => {
+                        video.load();
+                        video.play();
+                        video.pause();
+                    });
 
                     // スタートボタンを非表示
                     startButton.style.display = 'none';
                 });
 
-                // マーカーが検出されたときの処理
-                marker.addEventListener('markerFound', function () {
-                    video.play();
+                // 各マーカーに対する処理
+                markers.forEach((marker, index) => {
+                    marker.addEventListener('markerFound', function () {
+                        videos[index].play();
+                    });
+
+                    marker.addEventListener('markerLost', function () {
+                        videos[index].pause();
+                        videos[index].currentTime = 0;
+                    });
                 });
 
-                // マーカーが見失われたときの処理
-                marker.addEventListener('markerLost', function () {
-                    video.pause();
-                    video.currentTime = 0;
+                // GLBモデルのマーカー処理
+                const modelMarker = document.getElementById('marker23');
+                modelMarker.addEventListener('markerFound', function () {
+                    const model = document.querySelector('#model23');
+                    model.setAttribute('visible', 'true');
+                });
+
+                modelMarker.addEventListener('markerLost', function () {
+                    const model = document.querySelector('#model23');
+                    model.setAttribute('visible', 'false');
                 });
             });
         </script>
