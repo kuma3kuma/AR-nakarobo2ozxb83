@@ -1,123 +1,283 @@
-<!doctype html>
-<!-- 
-  Version: 1.1.0 
-  Author: [Your Name or Team Name]
-  Date: [YYYY-MM-DD]
-  Description: WebAR application with 23 assets (22 MP4 videos, 1 GLB model), including start button for user permissions. 
-  Changes:
-    - Simplified permission handling process.
-    - Ensured start button hides after permissions are granted.
-    - Implemented clear error handling for permission requests.
--->
-
+<!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="utf-8">
-        <title>AR Video and Model Playback</title>
-        <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
-        <script src="https://cdn.rawgit.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
-        <style>
-            #startButton {
-                position: absolute;
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%);
-                padding: 20px 40px;
-                font-size: 24px;
-                background-color: #007BFF;
-                color: white;
-                border: none;
-                border-radius: 5px;
-                cursor: pointer;
-                z-index: 9999;
-            }
-        </style>
-    </head>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Museum AR Guide</title>
+    <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
+    <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
+    <style>
+        #startUI {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            z-index: 999;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        #languageSelect {
+            margin: 20px;
+            padding: 10px;
+            font-size: 1.2em;
+            width: 200px;
+        }
+        
+        #startButton {
+            padding: 15px 30px;
+            font-size: 1.2em;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
 
-    <body style="margin: 0; overflow: hidden;">
+        #loading {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            z-index: 1000;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 20px;
+            border-radius: 10px;
+            display: none;
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+
+        #instructions {
+            margin: 20px;
+            font-size: 1.1em;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+    <div id="loading">読み込み中...</div>
+
+    <div id="startUI">
+        <h1>Museum AR Guide</h1>
+        <div id="instructions">
+            カメラを絵画のマーカーにかざすと、解説動画が表示されます。
+        </div>
+        <select id="languageSelect">
+            <option value="ja">日本語</option>
+            <option value="en">English</option>
+            <option value="zh">中文</option>
+            <option value="ko">한국어</option>
+            <option value="es">Español</option>
+            <option value="fr">Français</option>
+            <option value="de">Deutsch</option>
+            <option value="it">Italiano</option>
+        </select>
         <button id="startButton">タップして開始</button>
+    </div>
 
-        <a-scene
-            vr-mode-ui="enabled: false"
-            embedded
-            arjs="sourceType: webcam; debugUIEnabled: false;"
-        >
-            <a-assets>
-                <!-- 22個のビデオアセット -->
-                <video id="vid1" src="assets/asset1.mp4" preload="auto" loop crossorigin playsinline></video>
-                <video id="vid2" src="assets/asset2.mp4" preload="auto" loop crossorigin playsinline></video>
-                <!-- 以下、vid3 から vid22 まで同様に追加 -->
-                <video id="vid22" src="assets/asset22.mp4" preload="auto" loop crossorigin playsinline></video>
+    <a-scene
+        embedded
+        arjs='sourceType: webcam; debugUIEnabled: false; detectionMode: mono_and_matrix; matrixCodeType: 3x3;'
+        vr-mode-ui="enabled: false"
+        renderer="antialias: true; alpha: true"
+    >
+        <a-assets>
+            <video id="video1" preload="auto" loop playsinline webkit-playsinline></video>
+            <video id="video2" preload="auto" loop playsinline webkit-playsinline></video>
+            <video id="video3" preload="auto" loop playsinline webkit-playsinline></video>
+            <video id="video4" preload="auto" loop playsinline webkit-playsinline></video>
+            <video id="video5" preload="auto" loop playsinline webkit-playsinline></video>
+            <video id="video6" preload="auto" loop playsinline webkit-playsinline></video>
+            <video id="video7" preload="auto" loop playsinline webkit-playsinline></video>
+            <video id="video8" preload="auto" loop playsinline webkit-playsinline></video>
+        </a-assets>
 
-                <!-- GLBモデルのアセット -->
-                <a-asset-item id="model23" src="assets/model.glb"></a-asset-item>
-            </a-assets>
+        <a-marker type="pattern" url="markers/pattern-marker1.patt">
+            <a-video src="#video1" position="0 0 0" rotation="-90 0 0" width="2" height="1.5"></a-video>
+        </a-marker>
 
-            <!-- 22個のマーカー（ビデオ用） -->
-            <a-marker type="pattern" url="assets/marker1.patt" id="marker1">
-                <a-video src="#vid1" width="1" height="0.6" position="0 0 0" rotation="-90 0 0"></a-video>
-            </a-marker>
-            <a-marker type="pattern" url="assets/marker2.patt" id="marker2">
-                <a-video src="#vid2" width="1" height="0.6" position="0 0 0" rotation="-90 0 0"></a-video>
-            </a-marker>
-            <!-- 以下、marker3 から marker22 まで同様に追加 -->
+        <a-marker type="pattern" url="markers/pattern-marker2.patt">
+            <a-video src="#video2" position="0 0 0" rotation="-90 0 0" width="2" height="1.5"></a-video>
+        </a-marker>
 
-            <!-- GLBモデル用のマーカー -->
-            <a-marker type="pattern" url="assets/marker23.patt" id="marker23">
-                <a-entity gltf-model="#model23" scale="0.5 0.5 0.5" position="0 0 0" rotation="0 0 0"></a-entity>
-            </a-marker>
+        <a-marker type="pattern" url="markers/pattern-marker3.patt">
+            <a-video src="#video3" position="0 0 0" rotation="-90 0 0" width="2" height="1.5"></a-video>
+        </a-marker>
 
-            <a-entity camera></a-entity>
-        </a-scene>
+        <a-marker type="pattern" url="markers/pattern-marker4.patt">
+            <a-video src="#video4" position="0 0 0" rotation="-90 0 0" width="2" height="1.5"></a-video>
+        </a-marker>
 
-        <script>
-            document.addEventListener('DOMContentLoaded', function () {
-                const startButton = document.getElementById('startButton');
-                const videos = [];
-                for (let i = 1; i <= 22; i++) {
-                    videos.push(document.getElementById(`vid${i}`));
-                }
-                const markers = [];
-                for (let i = 1; i <= 22; i++) {
-                    markers.push(document.getElementById(`marker${i}`));
-                }
+        <a-marker type="pattern" url="markers/pattern-marker5.patt">
+            <a-video src="#video5" position="0 0 0" rotation="-90 0 0" width="2" height="1.5"></a-video>
+        </a-marker>
 
-                startButton.addEventListener('click', function () {
-                    // ビデオをロード
-                    videos.forEach(video => {
-                        video.load();
-                        video.play();
-                        video.pause();
-                    });
+        <a-marker type="pattern" url="markers/pattern-marker6.patt">
+            <a-video src="#video6" position="0 0 0" rotation="-90 0 0" width="2" height="1.5"></a-video>
+        </a-marker>
 
-                    // スタートボタンを非表示
-                    startButton.style.display = 'none';
-                });
+        <a-marker type="pattern" url="markers/pattern-marker7.patt">
+            <a-video src="#video7" position="0 0 0" rotation="-90 0 0" width="2" height="1.5"></a-video>
+        </a-marker>
 
-                // 各マーカーに対する処理
-                markers.forEach((marker, index) => {
-                    marker.addEventListener('markerFound', function () {
-                        videos[index].play();
-                    });
+        <a-marker type="pattern" url="markers/pattern-marker8.patt">
+            <a-video src="#video8" position="0 0 0" rotation="-90 0 0" width="2" height="1.5"></a-video>
+        </a-marker>
 
-                    marker.addEventListener('markerLost', function () {
-                        videos[index].pause();
-                        videos[index].currentTime = 0;
-                    });
-                });
+        <a-entity camera></a-entity>
+    </a-scene>
 
-                // GLBモデルのマーカー処理
-                const modelMarker = document.getElementById('marker23');
-                modelMarker.addEventListener('markerFound', function () {
-                    const model = document.querySelector('#model23');
-                    model.setAttribute('visible', 'true');
-                });
+    <script>
+        const startUI = document.getElementById('startUI');
+        const startButton = document.getElementById('startButton');
+        const languageSelect = document.getElementById('languageSelect');
+        const loading = document.getElementById('loading');
+        const instructions = document.getElementById('instructions');
 
-                modelMarker.addEventListener('markerLost', function () {
-                    const model = document.querySelector('#model23');
-                    model.setAttribute('visible', 'false');
+        // 言語ごとの説明文
+        const instructionTexts = {
+            ja: "カメラを絵画のマーカーにかざすと、解説動画が表示されます。",
+            en: "Point your camera at the painting markers to view explanation videos.",
+            zh: "将相机对准画作标记即可观看解说视频。",
+            ko: "카메라를 그림 마커에 비추면 설명 영상이 표시됩니다.",
+            es: "Apunte la cámara a los marcadores de las pinturas para ver videos explicativos.",
+            fr: "Pointez votre caméra vers les marqueurs des peintures pour voir les vidéos explicatives.",
+            de: "Richten Sie die Kamera auf die Gemäldemarkierungen, um Erklärungsvideos anzusehen.",
+            it: "Punta la fotocamera sui marcatori dei dipinti per vedere i video esplicativi."
+        };
+
+        // 言語ごとのボタンテキスト
+        const buttonTexts = {
+            ja: "タップして開始",
+            en: "Tap to Start",
+            zh: "点击开始",
+            ko: "탭하여 시작",
+            es: "Toque para comenzar",
+            fr: "Tapez pour commencer",
+            de: "Tippen zum Starten",
+            it: "Tocca per iniziare"
+        };
+
+        // 言語ごとのローディングテキスト
+        const loadingTexts = {
+            ja: "読み込み中...",
+            en: "Loading...",
+            zh: "加载中...",
+            ko: "로딩중...",
+            es: "Cargando...",
+            fr: "Chargement...",
+            de: "Laden...",
+            it: "Caricamento..."
+        };
+
+        // 言語ごとのビデオパス
+        const videoSources = {
+            ja: {
+                video1: 'videos/ja/video1.mp4',
+                video2: 'videos/ja/video2.mp4',
+                video3: 'videos/ja/video3.mp4',
+                video4: 'videos/ja/video4.mp4',
+                video5: 'videos/ja/video5.mp4',
+                video6: 'videos/ja/video6.mp4',
+                video7: 'videos/ja/video7.mp4',
+                video8: 'videos/ja/video8.mp4'
+            },
+            en: {
+                video1: 'videos/en/video1.mp4',
+                video2: 'videos/en/video2.mp4',
+                video3: 'videos/en/video3.mp4',
+                video4: 'videos/en/video4.mp4',
+                video5: 'videos/en/video5.mp4',
+                video6: 'videos/en/video6.mp4',
+                video7: 'videos/en/video7.mp4',
+                video8: 'videos/en/video8.mp4'
+            },
+            // 他の言語も同様に定義
+        };
+
+        // 言語選択時のUI更新
+        languageSelect.addEventListener('change', (event) => {
+            const language = event.target.value;
+            instructions.textContent = instructionTexts[language];
+            startButton.textContent = buttonTexts[language];
+            loading.textContent = loadingTexts[language];
+        });
+
+        // ビデオの読み込みを追跡する変数
+        let loadedVideos = 0;
+        const totalVideos = 8;
+
+        // ビデオ読み込み完了時の処理
+        function onVideoLoaded() {
+            loadedVideos++;
+            if (loadedVideos === totalVideos) {
+                loading.style.display = 'none';
+            }
+        }
+
+        // ビデオソースの更新
+        function updateVideoSources(language) {
+            loading.style.display = 'block';
+            loadedVideos = 0;
+            
+            const sources = videoSources[language];
+            Object.keys(sources).forEach(videoId => {
+                const videoElement = document.getElementById(videoId);
+                videoElement.addEventListener('loadeddata', onVideoLoaded);
+                videoElement.src = sources[videoId];
+                videoElement.load();
+            });
+        }
+
+        // 開始ボタンクリック時の処理
+        startButton.addEventListener('click', () => {
+            const selectedLanguage = languageSelect.value;
+            updateVideoSources(selectedLanguage);
+            startUI.classList.add('hidden');
+
+            // すべてのビデオ要素に対してイベントリスナーを設定
+            document.querySelectorAll('video').forEach(video => {
+                video.play().catch(error => {
+                    console.log("Video autoplay failed:", error);
                 });
             });
-        </script>
-    </body>
+        });
+
+        // iOS Safari対応
+        document.addEventListener('touchstart', () => {
+            document.querySelectorAll('video').forEach(video => {
+                video.play().catch(error => {
+                    console.log("Video autoplay failed:", error);
+                });
+            });
+        }, { once: true });
+
+        // マーカー検出時のイベント
+        document.querySelectorAll('a-marker').forEach(marker => {
+            marker.addEventListener('markerFound', () => {
+                const videoElement = marker.querySelector('a-video').components.material.material.map.image;
+                videoElement.play().catch(error => {
+                    console.log("Video autoplay failed:", error);
+                });
+            });
+
+            marker.addEventListener('markerLost', () => {
+                const videoElement = marker.querySelector('a-video').components.material.material.map.image;
+                videoElement.pause();
+            });
+        });
+    </script>
+</body>
 </html>
