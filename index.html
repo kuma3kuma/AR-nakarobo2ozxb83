@@ -97,11 +97,6 @@
             <video id="video1" preload="auto" loop playsinline webkit-playsinline></video>
             <video id="video2" preload="auto" loop playsinline webkit-playsinline></video>
             <video id="video3" preload="auto" loop playsinline webkit-playsinline></video>
-            <video id="video4" preload="auto" loop playsinline webkit-playsinline></video>
-            <video id="video5" preload="auto" loop playsinline webkit-playsinline></video>
-            <video id="video6" preload="auto" loop playsinline webkit-playsinline></video>
-            <video id="video7" preload="auto" loop playsinline webkit-playsinline></video>
-            <video id="video8" preload="auto" loop playsinline webkit-playsinline></video>
         </a-assets>
 
         <a-marker type="pattern" url="markers/pattern-marker1.patt">
@@ -114,26 +109,6 @@
 
         <a-marker type="pattern" url="markers/pattern-marker3.patt">
             <a-video src="#video3" position="0 0 0" rotation="-90 0 0" width="2" height="1.5"></a-video>
-        </a-marker>
-
-        <a-marker type="pattern" url="markers/pattern-marker4.patt">
-            <a-video src="#video4" position="0 0 0" rotation="-90 0 0" width="2" height="1.5"></a-video>
-        </a-marker>
-
-        <a-marker type="pattern" url="markers/pattern-marker5.patt">
-            <a-video src="#video5" position="0 0 0" rotation="-90 0 0" width="2" height="1.5"></a-video>
-        </a-marker>
-
-        <a-marker type="pattern" url="markers/pattern-marker6.patt">
-            <a-video src="#video6" position="0 0 0" rotation="-90 0 0" width="2" height="1.5"></a-video>
-        </a-marker>
-
-        <a-marker type="pattern" url="markers/pattern-marker7.patt">
-            <a-video src="#video7" position="0 0 0" rotation="-90 0 0" width="2" height="1.5"></a-video>
-        </a-marker>
-
-        <a-marker type="pattern" url="markers/pattern-marker8.patt">
-            <a-video src="#video8" position="0 0 0" rotation="-90 0 0" width="2" height="1.5"></a-video>
         </a-marker>
 
         <a-entity camera></a-entity>
@@ -187,22 +162,12 @@
             ja: {
                 video1: 'videos/ja/video1.mp4',
                 video2: 'videos/ja/video2.mp4',
-                video3: 'videos/ja/video3.mp4',
-                video4: 'videos/ja/video4.mp4',
-                video5: 'videos/ja/video5.mp4',
-                video6: 'videos/ja/video6.mp4',
-                video7: 'videos/ja/video7.mp4',
-                video8: 'videos/ja/video8.mp4'
+                video3: 'videos/ja/video3.mp4'
             },
             en: {
                 video1: 'videos/en/video1.mp4',
                 video2: 'videos/en/video2.mp4',
-                video3: 'videos/en/video3.mp4',
-                video4: 'videos/en/video4.mp4',
-                video5: 'videos/en/video5.mp4',
-                video6: 'videos/en/video6.mp4',
-                video7: 'videos/en/video7.mp4',
-                video8: 'videos/en/video8.mp4'
+                video3: 'videos/en/video3.mp4'
             },
             // 他の言語も同様に定義
         };
@@ -217,7 +182,7 @@
 
         // ビデオの読み込みを追跡する変数
         let loadedVideos = 0;
-        const totalVideos = 8;
+        const totalVideos = 3;
 
         // ビデオ読み込み完了時の処理
         function onVideoLoaded() {
