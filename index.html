@@ -89,7 +89,7 @@
 
     <a-scene
         embedded
-        arjs='sourceType: webcam; debugUIEnabled: false; detectionMode: mono_and_matrix; matrixCodeType: 3x3;'
+        arjs='sourceType: webcam; debugUIEnabled: false; detectionMode: mono_and_matrix; matrixCodeType: 3x3; patternRatio: 0.80;'
         vr-mode-ui="enabled: false"
         renderer="antialias: true; alpha: true"
     >
@@ -169,7 +169,36 @@
                 video2: 'videos/en/video2.mp4',
                 video3: 'videos/en/video3.mp4'
             },
-            // 他の言語も同様に定義
+            zh: {
+                video1: 'videos/zh/video1.mp4',
+                video2: 'videos/zh/video2.mp4',
+                video3: 'videos/zh/video3.mp4'
+            },
+            ko: {
+                video1: 'videos/ko/video1.mp4',
+                video2: 'videos/ko/video2.mp4',
+                video3: 'videos/ko/video3.mp4'
+            },
+            es: {
+                video1: 'videos/es/video1.mp4',
+                video2: 'videos/es/video2.mp4',
+                video3: 'videos/es/video3.mp4'
+            },
+            fr: {
+                video1: 'videos/fr/video1.mp4',
+                video2: 'videos/fr/video2.mp4',
+                video3: 'videos/fr/video3.mp4'
+            },
+            de: {
+                video1: 'videos/de/video1.mp4',
+                video2: 'videos/de/video2.mp4',
+                video3: 'videos/de/video3.mp4'
+            },
+            it: {
+                video1: 'videos/it/video1.mp4',
+                video2: 'videos/it/video2.mp4',
+                video3: 'videos/it/video3.mp4'
+            }
         };
 
         // 言語選択時のUI更新
@@ -180,39 +209,46 @@
             loading.textContent = loadingTexts[language];
         });
 
-        // ビデオの読み込みを追跡する変数
         let loadedVideos = 0;
         const totalVideos = 3;
 
-        // ビデオ読み込み完了時の処理
         function onVideoLoaded() {
             loadedVideos++;
             if (loadedVideos === totalVideos) {
                 loading.style.display = 'none';
+                startUI.classList.add('hidden');
             }
         }
 
-        // ビデオソースの更新
         function updateVideoSources(language) {
             loading.style.display = 'block';
             loadedVideos = 0;
             
             const sources = videoSources[language];
-            Object.keys(sources).forEach(videoId => {
-                const videoElement = document.getElementById(videoId);
-                videoElement.addEventListener('loadeddata', onVideoLoaded);
-                videoElement.src = sources[videoId];
-                videoElement.load();
+            const videoElements = document.querySelectorAll('video');
+            
+            videoElements.forEach((video, index) => {
+                const videoId = `video${index + 1}`;
+                video.removeEventListener('loadeddata', onVideoLoaded);
+                video.addEventListener('loadeddata', onVideoLoaded, { once: true });
+                video.src = sources[videoId];
+                video.load();
             });
+
+            // 10秒後にローディング表示を強制的に非表示
+            setTimeout(() => {
+                if (loading.style.display !== 'none') {
+                    loading.style.display = 'none';
+                    startUI.classList.add('hidden');
+                    console.log('Loading timeout - forcing hide loading screen');
+                }
+            }, 10000);
         }
 
-        // 開始ボタンクリック時の処理
         startButton.addEventListener('click', () => {
             const selectedLanguage = languageSelect.value;
             updateVideoSources(selectedLanguage);
-            startUI.classList.add('hidden');
 
-            // すべてのビデオ要素に対してイベントリスナーを設定
             document.querySelectorAll('video').forEach(video => {
                 video.play().catch(error => {
                     console.log("Video autoplay failed:", error);
