@@ -94,21 +94,66 @@
         renderer="antialias: true; alpha: true"
     >
         <a-assets>
-            <video id="video1" preload="auto" loop playsinline webkit-playsinline></video>
-            <video id="video2" preload="auto" loop playsinline webkit-playsinline></video>
-            <video id="video3" preload="auto" loop playsinline webkit-playsinline></video>
+            <video 
+                id="video1" 
+                preload="auto" 
+                loop 
+                crossorigin="anonymous"
+                playsinline 
+                webkit-playsinline
+                muted
+            ></video>
+            <video 
+                id="video2" 
+                preload="auto" 
+                loop 
+                crossorigin="anonymous"
+                playsinline 
+                webkit-playsinline
+                muted
+            ></video>
+            <video 
+                id="video3" 
+                preload="auto" 
+                loop 
+                crossorigin="anonymous"
+                playsinline 
+                webkit-playsinline
+                muted
+            ></video>
         </a-assets>
 
         <a-marker type="pattern" url="markers/pattern-marker1.patt">
-            <a-video src="#video1" position="0 0 0" rotation="-90 0 0" width="2" height="1.5"></a-video>
+            <a-video 
+                src="#video1" 
+                position="0 0 0" 
+                rotation="-90 0 0" 
+                width="2" 
+                height="1.5"
+                play-on-click
+            ></a-video>
         </a-marker>
 
         <a-marker type="pattern" url="markers/pattern-marker2.patt">
-            <a-video src="#video2" position="0 0 0" rotation="-90 0 0" width="2" height="1.5"></a-video>
+            <a-video 
+                src="#video2" 
+                position="0 0 0" 
+                rotation="-90 0 0" 
+                width="2" 
+                height="1.5"
+                play-on-click
+            ></a-video>
         </a-marker>
 
         <a-marker type="pattern" url="markers/pattern-marker3.patt">
-            <a-video src="#video3" position="0 0 0" rotation="-90 0 0" width="2" height="1.5"></a-video>
+            <a-video 
+                src="#video3" 
+                position="0 0 0" 
+                rotation="-90 0 0" 
+                width="2" 
+                height="1.5"
+                play-on-click
+            ></a-video>
         </a-marker>
 
         <a-entity camera></a-entity>
@@ -121,7 +166,6 @@
         const loading = document.getElementById('loading');
         const instructions = document.getElementById('instructions');
 
-        // 言語ごとの説明文
         const instructionTexts = {
             ja: "カメラを絵画のマーカーにかざすと、解説動画が表示されます。",
             en: "Point your camera at the painting markers to view explanation videos.",
@@ -133,7 +177,6 @@
             it: "Punta la fotocamera sui marcatori dei dipinti per vedere i video esplicativi."
         };
 
-        // 言語ごとのボタンテキスト
         const buttonTexts = {
             ja: "タップして開始",
             en: "Tap to Start",
@@ -145,7 +188,6 @@
             it: "Tocca per iniziare"
         };
 
-        // 言語ごとのローディングテキスト
         const loadingTexts = {
             ja: "読み込み中...",
             en: "Loading...",
@@ -157,7 +199,6 @@
             it: "Caricamento..."
         };
 
-        // 言語ごとのビデオパス
         const videoSources = {
             ja: {
                 video1: 'videos/ja/video1.mp4',
@@ -201,7 +242,6 @@
             }
         };
 
-        // 言語選択時のUI更新
         languageSelect.addEventListener('change', (event) => {
             const language = event.target.value;
             instructions.textContent = instructionTexts[language];
@@ -235,7 +275,6 @@
                 video.load();
             });
 
-            // 10秒後にローディング表示を強制的に非表示
             setTimeout(() => {
                 if (loading.style.display !== 'none') {
                     loading.style.display = 'none';
@@ -248,37 +287,46 @@
         startButton.addEventListener('click', () => {
             const selectedLanguage = languageSelect.value;
             updateVideoSources(selectedLanguage);
-
-            document.querySelectorAll('video').forEach(video => {
-                video.play().catch(error => {
-                    console.log("Video autoplay failed:", error);
-                });
-            });
         });
 
-        // iOS Safari対応
-        document.addEventListener('touchstart', () => {
-            document.querySelectorAll('video').forEach(video => {
-                video.play().catch(error => {
-                    console.log("Video autoplay failed:", error);
-                });
-            });
-        }, { once: true });
-
-        // マーカー検出時のイベント
         document.querySelectorAll('a-marker').forEach(marker => {
             marker.addEventListener('markerFound', () => {
-                const videoElement = marker.querySelector('a-video').components.material.material.map.image;
-                videoElement.play().catch(error => {
-                    console.log("Video autoplay failed:", error);
-                });
+                const video = marker.querySelector('a-video').getAttribute('src');
+                const videoElement = document.querySelector(video);
+                if (videoElement) {
+                    videoElement.currentTime = 0;
+                    const playPromise = videoElement.play();
+                    if (playPromise !== undefined) {
+                        playPromise.catch(error => {
+                            console.log("Video autoplay failed:", error);
+                            document.addEventListener('click', () => {
+                                videoElement.play();
+                            }, { once: true });
+                        });
+                    }
+                }
             });
 
             marker.addEventListener('markerLost', () => {
-                const videoElement = marker.querySelector('a-video').components.material.material.map.image;
-                videoElement.pause();
+                const video = marker.querySelector('a-video').getAttribute('src');
+                const videoElement = document.querySelector(video);
+                if (videoElement) {
+                    videoElement.pause();
+                }
             });
         });
+
+        document.addEventListener('touchstart', () => {
+            const videos = document.querySelectorAll('video');
+            videos.forEach(video => {
+                const playPromise = video.play();
+                if (playPromise !== undefined) {
+                    playPromise.catch(error => {
+                        console.log("Video autoplay failed on touch:", error);
+                    });
+                }
+            });
+        }, { once: true });
     </script>
 </body>
 </html>
