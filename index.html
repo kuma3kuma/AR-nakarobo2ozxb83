@@ -64,6 +64,28 @@
             font-size: 1.1em;
             line-height: 1.5;
         }
+
+        .play-button {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            z-index: 100;
+        }
+
+        .play-button::after {
+            content: '';
+            width: 0;
+            height: 0;
+            border-style: solid;
+            border-width: 15px 0 15px 25px;
+            border-color: transparent transparent transparent #000;
+        }
     </style>
 </head>
 <body>
@@ -92,38 +114,45 @@
         arjs='sourceType: webcam; debugUIEnabled: false; detectionMode: mono_and_matrix; matrixCodeType: 3x3; patternRatio: 0.80;'
         vr-mode-ui="enabled: false"
         renderer="antialias: true; alpha: true"
+        gesture-detector
     >
         <a-assets>
             <video 
                 id="video1" 
+                src=""
                 preload="auto" 
                 loop 
                 crossorigin="anonymous"
                 playsinline 
                 webkit-playsinline
                 muted
+                style="display: none"
             ></video>
             <video 
                 id="video2" 
+                src=""
                 preload="auto" 
                 loop 
                 crossorigin="anonymous"
                 playsinline 
                 webkit-playsinline
                 muted
+                style="display: none"
             ></video>
             <video 
                 id="video3" 
+                src=""
                 preload="auto" 
                 loop 
                 crossorigin="anonymous"
                 playsinline 
                 webkit-playsinline
                 muted
+                style="display: none"
             ></video>
         </a-assets>
 
-        <a-marker type="pattern" url="markers/pattern-marker1.patt">
+        <a-marker type="pattern" url="markers/pattern-marker1.patt" video-handler="video: #video1">
             <a-video 
                 src="#video1" 
                 position="0 0 0" 
@@ -132,10 +161,11 @@
                 height="1.5"
                 material="shader: flat; transparent: true"
                 class="clickable"
+                gesture-handler
             ></a-video>
         </a-marker>
 
-        <a-marker type="pattern" url="markers/pattern-marker2.patt">
+        <a-marker type="pattern" url="markers/pattern-marker2.patt" video-handler="video: #video2">
             <a-video 
                 src="#video2" 
                 position="0 0 0" 
@@ -144,10 +174,11 @@
                 height="1.5"
                 material="shader: flat; transparent: true"
                 class="clickable"
+                gesture-handler
             ></a-video>
         </a-marker>
 
-        <a-marker type="pattern" url="markers/pattern-marker3.patt">
+        <a-marker type="pattern" url="markers/pattern-marker3.patt" video-handler="video: #video3">
             <a-video 
                 src="#video3" 
                 position="0 0 0" 
@@ -156,6 +187,7 @@
                 height="1.5"
                 material="shader: flat; transparent: true"
                 class="clickable"
+                gesture-handler
             ></a-video>
         </a-marker>
 
@@ -245,6 +277,78 @@
             }
         };
 
+        // ジェスチャーハンドラーコンポーネントの登録
+        AFRAME.registerComponent('gesture-detector', {
+            schema: {
+                enabled: { default: true }
+            },
+            init: function() {
+                this.targetElement = this.el;
+                this.handleClick = this.handleClick.bind(this);
+                this.el.sceneEl.addEventListener('click', this.handleClick);
+                this.el.sceneEl.addEventListener('touchstart', this.handleClick);
+            },
+            handleClick: function(evt) {
+                if (!this.data.enabled) return;
+                
+                const touch = evt.touches ? evt.touches[0] : evt;
+                const element = document.elementFromPoint(
+                    touch.clientX,
+                    touch.clientY
+                );
+
+                if (!element) return;
+                
+                const marker = element.closest('a-marker');
+                if (!marker) return;
+
+                const videoId = marker.getAttribute('video-handler').video;
+                const video = document.querySelector(videoId);
+                
+                if (video) {
+                    if (video.paused) {
+                        video.play().then(() => {
+                            video.muted = false;
+                        }).catch(error => {
+                            console.log('Video play error:', error);
+                        });
+                    } else {
+                        video.pause();
+                    }
+                }
+            },
+            remove: function() {
+                this.el.sceneEl.removeEventListener('click', this.handleClick);
+                this.el.sceneEl.removeEventListener('touchstart', this.handleClick);
+            }
+        });
+
+        // ビデオハンドラーコンポーネントの登録
+        AFRAME.registerComponent('video-handler', {
+            schema: {
+                video: { type: 'selector' }
+            },
+            init: function() {
+                const video = this.data.video;
+                
+                this.el.addEventListener('markerFound', () => {
+                    if (video) {
+                        video.currentTime = 0;
+                        video.muted = true;
+                        video.load();
+                        video.pause();
+                        video.currentTime = 0;
+                    }
+                });
+
+                this.el.addEventListener('markerLost', () => {
+                    if (video) {
+                        video.pause();
+                    }
+                });
+            }
+        });
+
         languageSelect.addEventListener('change', (event) => {
             const language = event.target.value;
             instructions.textContent = instructionTexts[language];
@@ -292,90 +396,23 @@
             updateVideoSources(selectedLanguage);
         });
 
-        // カーソルコンポーネントを追加
-        AFRAME.registerComponent('cursor-listener', {
-            init: function () {
-                this.el.addEventListener('click', function (evt) {
-                    const videoEl = this;
-                    const videoId = videoEl.getAttribute('src').substring(1);
-                    const videoElement = document.getElementById(videoId);
-                    
-                    if (videoElement) {
-                        if (videoElement.paused) {
-                            videoElement.play();
-                        } else {
-                            videoElement.pause();
-                        }
-                    }
+        // iOS Safariでの自動再生対応
+        function enableAutoplay() {
+            const videos = document.querySelectorAll('video');
+            videos.forEach(video => {
+                video.play().then(() => {
+                    video.pause();
+                    video.currentTime = 0;
+                }).catch(error => {
+                    console.log('Autoplay initialization failed:', error);
                 });
-            }
-        });
-
-        // クリック可能な要素にコンポーネントを追加
-        document.querySelectorAll('.clickable').forEach(el => {
-            el.setAttribute('cursor-listener', '');
-        });
-
-        // マーカー検出時の処理を修正
-        document.querySelectorAll('a-marker').forEach(marker => {
-            marker.addEventListener('markerFound', () => {
-                const videoEl = marker.querySelector('a-video');
-                const videoId = videoEl.getAttribute('src').substring(1);
-                const videoElement = document.getElementById(videoId);
-                
-                if (videoElement) {
-                    videoElement.currentTime = 0;
-                    videoElement.muted = true;
-                    // マーカーを認識したときは自動再生せず、最初のフレームを表示
-                    videoElement.load();
-                    videoElement.pause();
-                    videoElement.currentTime = 0;
-                    videoElement.muted = false;
-                }
             });
-
-            marker.addEventListener('markerLost', () => {
-                const videoEl = marker.querySelector('a-video');
-                const videoId = videoEl.getAttribute('src').substring(1);
-                const videoElement = document.getElementById(videoId);
-                if (videoElement) {
-                    videoElement.pause();
-                }
-            });
-        });
-
-        // カメラとレイキャスターを追加
-        const scene = document.querySelector('a-scene');
-        const camera = document.querySelector('a-entity[camera]');
-        
-        if (camera) {
-            // カーソルを追加
-            const cursor = document.createElement('a-entity');
-            cursor.setAttribute('cursor', 'rayOrigin: mouse;');
-            cursor.setAttribute('raycaster', 'objects: .clickable');
-            camera.appendChild(cursor);
         }
 
-        // タッチデバイス対応
-        document.addEventListener('touchstart', function(e) {
-            // レイキャストを実行して、タップされた要素を特定
-            const touch = e.touches[0];
-            const element = document.elementFromPoint(touch.clientX, touch.clientY);
-            
-            if (element && element.closest('.clickable')) {
-                const videoEl = element.closest('.clickable');
-                const videoId = videoEl.getAttribute('src').substring(1);
-                const videoElement = document.getElementById(videoId);
-                
-                if (videoElement) {
-                    if (videoElement.paused) {
-                        videoElement.play();
-                    } else {
-                        videoElement.pause();
-                    }
-                }
-            }
-        });
+        // ページ読み込み時とユーザーインタラクション時に自動再生を有効化
+        document.addEventListener('DOMContentLoaded', enableAutoplay);
+        document.addEventListener('touchstart', enableAutoplay, { once: true });
+        document.addEventListener('click', enableAutoplay, { once: true });
     </script>
 </body>
 </html>
