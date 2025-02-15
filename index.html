@@ -291,16 +291,25 @@
 
         document.querySelectorAll('a-marker').forEach(marker => {
             marker.addEventListener('markerFound', () => {
-                const video = marker.querySelector('a-video').getAttribute('src');
-                const videoElement = document.querySelector(video);
+                const videoEl = marker.querySelector('a-video');
+                const videoId = videoEl.getAttribute('src').substring(1);
+                const videoElement = document.getElementById(videoId);
+                
                 if (videoElement) {
                     videoElement.currentTime = 0;
+                    videoElement.muted = true;
                     const playPromise = videoElement.play();
+                    
                     if (playPromise !== undefined) {
-                        playPromise.catch(error => {
+                        playPromise.then(() => {
+                            console.log('Video playback started');
+                            videoElement.muted = false;
+                        }).catch(error => {
                             console.log("Video autoplay failed:", error);
                             document.addEventListener('click', () => {
-                                videoElement.play();
+                                videoElement.play().then(() => {
+                                    videoElement.muted = false;
+                                });
                             }, { once: true });
                         });
                     }
@@ -308,8 +317,9 @@
             });
 
             marker.addEventListener('markerLost', () => {
-                const video = marker.querySelector('a-video').getAttribute('src');
-                const videoElement = document.querySelector(video);
+                const videoEl = marker.querySelector('a-video');
+                const videoId = videoEl.getAttribute('src').substring(1);
+                const videoElement = document.getElementById(videoId);
                 if (videoElement) {
                     videoElement.pause();
                 }
