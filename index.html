@@ -130,7 +130,8 @@
                 rotation="-90 0 0" 
                 width="2" 
                 height="1.5"
-                play-on-click
+                material="shader: flat; transparent: true"
+                class="clickable"
             ></a-video>
         </a-marker>
 
@@ -141,7 +142,8 @@
                 rotation="-90 0 0" 
                 width="2" 
                 height="1.5"
-                play-on-click
+                material="shader: flat; transparent: true"
+                class="clickable"
             ></a-video>
         </a-marker>
 
@@ -152,7 +154,8 @@
                 rotation="-90 0 0" 
                 width="2" 
                 height="1.5"
-                play-on-click
+                material="shader: flat; transparent: true"
+                class="clickable"
             ></a-video>
         </a-marker>
 
@@ -289,6 +292,31 @@
             updateVideoSources(selectedLanguage);
         });
 
+        // カーソルコンポーネントを追加
+        AFRAME.registerComponent('cursor-listener', {
+            init: function () {
+                this.el.addEventListener('click', function (evt) {
+                    const videoEl = this;
+                    const videoId = videoEl.getAttribute('src').substring(1);
+                    const videoElement = document.getElementById(videoId);
+                    
+                    if (videoElement) {
+                        if (videoElement.paused) {
+                            videoElement.play();
+                        } else {
+                            videoElement.pause();
+                        }
+                    }
+                });
+            }
+        });
+
+        // クリック可能な要素にコンポーネントを追加
+        document.querySelectorAll('.clickable').forEach(el => {
+            el.setAttribute('cursor-listener', '');
+        });
+
+        // マーカー検出時の処理を修正
         document.querySelectorAll('a-marker').forEach(marker => {
             marker.addEventListener('markerFound', () => {
                 const videoEl = marker.querySelector('a-video');
@@ -298,21 +326,11 @@
                 if (videoElement) {
                     videoElement.currentTime = 0;
                     videoElement.muted = true;
-                    const playPromise = videoElement.play();
-                    
-                    if (playPromise !== undefined) {
-                        playPromise.then(() => {
-                            console.log('Video playback started');
-                            videoElement.muted = false;
-                        }).catch(error => {
-                            console.log("Video autoplay failed:", error);
-                            document.addEventListener('click', () => {
-                                videoElement.play().then(() => {
-                                    videoElement.muted = false;
-                                });
-                            }, { once: true });
-                        });
-                    }
+                    // マーカーを認識したときは自動再生せず、最初のフレームを表示
+                    videoElement.load();
+                    videoElement.pause();
+                    videoElement.currentTime = 0;
+                    videoElement.muted = false;
                 }
             });
 
@@ -326,17 +344,38 @@
             });
         });
 
-        document.addEventListener('touchstart', () => {
-            const videos = document.querySelectorAll('video');
-            videos.forEach(video => {
-                const playPromise = video.play();
-                if (playPromise !== undefined) {
-                    playPromise.catch(error => {
-                        console.log("Video autoplay failed on touch:", error);
-                    });
+        // カメラとレイキャスターを追加
+        const scene = document.querySelector('a-scene');
+        const camera = document.querySelector('a-entity[camera]');
+        
+        if (camera) {
+            // カーソルを追加
+            const cursor = document.createElement('a-entity');
+            cursor.setAttribute('cursor', 'rayOrigin: mouse;');
+            cursor.setAttribute('raycaster', 'objects: .clickable');
+            camera.appendChild(cursor);
+        }
+
+        // タッチデバイス対応
+        document.addEventListener('touchstart', function(e) {
+            // レイキャストを実行して、タップされた要素を特定
+            const touch = e.touches[0];
+            const element = document.elementFromPoint(touch.clientX, touch.clientY);
+            
+            if (element && element.closest('.clickable')) {
+                const videoEl = element.closest('.clickable');
+                const videoId = videoEl.getAttribute('src').substring(1);
+                const videoElement = document.getElementById(videoId);
+                
+                if (videoElement) {
+                    if (videoElement.paused) {
+                        videoElement.play();
+                    } else {
+                        videoElement.pause();
+                    }
                 }
-            });
-        }, { once: true });
+            }
+        });
     </script>
 </body>
 </html>
