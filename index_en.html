@@ -1,65 +1,122 @@
-<!DOCTYPE html>
-
-<html>
-
-<head>
-
-    <meta charset="utf-8">
-
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>Museum AR Guide - English</title>
-
-    <!-- ... 他のhead要素 ... -->
-
-</head>
-
-<body>
-
-    <div id="loading">Loading...</div>
-
-    <div id="playIndicator" class="play-indicator">Tap to Play</div>
-
-
-
-    <div id="startUI">
-
-        <h1>Museum AR Guide</h1>
-
-        <div id="instructions">
-
-            Point your camera at the painting markers to view explanation videos.
-
-        </div>
-
-        <button id="startButton">Tap to Start</button>
-
-    </div>
-
-
-
-    <!-- ... A-Frame シーン ... -->
-
-
-
     <script>
+        const startUI = document.getElementById('startUI');
+        const startButton = document.getElementById('startButton');
+        const loading = document.getElementById('loading');
+        const playIndicator = document.getElementById('playIndicator');
+        let loadedVideos = 0;
+        const totalVideos = 3;
 
-        const videoSources = {
+        // Initialize videos
+        function initializeVideos() {
+            const videos = document.querySelectorAll('video');
+            videos.forEach(video => {
+                video.muted = true;
+                video.playsInline = true;
+                video.setAttribute('playsinline', '');
+                video.setAttribute('webkit-playsinline', '');
+            });
+        }
 
-            video1: 'videos/en/video1.mp4',
+        // Marker detection handling
+        document.querySelectorAll('a-marker').forEach(marker => {
+            const videoNum = marker.getAttribute('videonum');
+            const video = document.querySelector(`#video${videoNum}`);
+            
+            marker.addEventListener('markerFound', () => {
+                console.log('Marker found:', videoNum);
+                playIndicator.style.display = 'block';
+                if (video) {
+                    video.muted = true;
+                    video.currentTime = 0;
+                }
+            });
 
-            video2: 'videos/en/video2.mp4',
+            marker.addEventListener('markerLost', () => {
+                if (video) {
+                    video.pause();
+                    playIndicator.style.display = 'none';
+                }
+            });
+        });
 
-            video3: 'videos/en/video3.mp4'
+        // Touch event handling
+        document.addEventListener('touchstart', function(e) {
+            const touch = e.touches[0];
+            const element = document.elementFromPoint(touch.clientX, touch.clientY);
+            const marker = element ? element.closest('a-marker') : null;
+            
+            if (marker) {
+                const videoNum = marker.getAttribute('videonum');
+                const video = document.querySelector(`#video${videoNum}`);
+                
+                if (video) {
+                    if (video.paused) {
+                        video.muted = true;
+                        video.play()
+                            .then(() => {
+                                setTimeout(() => {
+                                    video.muted = false;
+                                    playIndicator.style.display = 'none';
+                                }, 1000);
+                            })
+                            .catch(error => {
+                                console.error('Video play error:', error);
+                                playIndicator.style.display = 'block';
+                            });
+                    } else {
+                        video.pause();
+                        playIndicator.style.display = 'block';
+                    }
+                }
+            }
+        });
 
-        };
+        function onVideoLoaded() {
+            loadedVideos++;
+            if (loadedVideos === totalVideos) {
+                loading.style.display = 'none';
+                startUI.classList.add('hidden');
+            }
+        }
 
-        
+        // Monitor video loading
+        document.querySelectorAll('video').forEach(video => {
+            video.addEventListener('loadeddata', onVideoLoaded, { once: true });
+        });
 
-        // ... 他のJavaScript（言語選択関連のコードを削除）... 
+        startButton.addEventListener('click', () => {
+            loading.style.display = 'block';
+            
+            // Start loading videos
+            const videos = document.querySelectorAll('video');
+            videos.forEach(video => {
+                video.load();
+            });
 
+            // Timeout handling
+            setTimeout(() => {
+                if (loading.style.display !== 'none') {
+                    loading.style.display = 'none';
+                    startUI.classList.add('hidden');
+                }
+            }, 5000);
+        });
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeVideos();
+        });
+
+        // iOS Safari support
+        document.addEventListener('touchstart', () => {
+            const videos = document.querySelectorAll('video');
+            videos.forEach(video => {
+                video.play().then(() => {
+                    video.pause();
+                    video.currentTime = 0;
+                }).catch(console.error);
+            });
+        }, { once: true });
     </script>
-
 </body>
-
 </html>
