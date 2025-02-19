@@ -1,28 +1,14 @@
 <!doctype html>
 <html>
     <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Museum AR Guide - 日本語</title>
+        <!--
+        これは、A-FrameとAR.jsを使用したWebARの設定です。
+        ビデオアセットを順次読み込み、利用可能になり次第再生します。
+        -->
         <script src="https://aframe.io/releases/1.0.4/aframe.min.js"></script>
         <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
         <script src="https://raw.githack.com/AR-js-org/studio-backend/master/src/modules/marker/tools/gesture-detector.js"></script>
         <script src="https://raw.githack.com/AR-js-org/studio-backend/master/src/modules/marker/tools/gesture-handler.js"></script>
-        <style>
-            #backButton {
-                position: fixed;
-                top: 20px;
-                left: 20px;
-                padding: 10px 20px;
-                background: rgba(0, 0, 0, 0.7);
-                color: white;
-                border: none;
-                border-radius: 5px;
-                cursor: pointer;
-                z-index: 1001;
-                font-size: 1em;
-            }
-        </style>
         <script>
             AFRAME.registerComponent('videohandler', {
                 schema: {
@@ -35,63 +21,59 @@
                     // 全てのビデオ要素を取得
                     this.allVideos = document.querySelectorAll('video');
 
+                    // iOS用のタップイベントリスナーを追加
+                    document.body.addEventListener('touchend', this.handleTap.bind(this));
+
                     // 現在再生中のビデオを追跡するグローバル変数
                     if (!window.currentPlayingVideo) {
                         window.currentPlayingVideo = null;
                     }
 
-                    marker.addEventListener('markerFound', () => {
-                        // 他のビデオが再生中の場合は停止
-                        if (window.currentPlayingVideo && window.currentPlayingVideo !== this.vid) {
-                            window.currentPlayingVideo.pause();
-                            window.currentPlayingVideo.currentTime = 0;
-                        }
-                        this.playVideo();
-                    });
+                    // ビデオがすでに読み込まれているかを確認
+                    if (this.vid.readyState >= 3) {
+                        marker.addEventListener('markerFound', () => {
+                            this.playVideo();
+                        });
+                    } else {
+                        this.vid.addEventListener('loadeddata', () => {
+                            marker.addEventListener('markerFound', () => {
+                                this.playVideo();
+                            });
+                        });
+                    }
 
                     marker.addEventListener('markerLost', () => {
                         this.pauseVideo();
                     });
 
                     // iPhoneで音声が再生されるようにする
-                    document.addEventListener('click', () => {
-                        if (this.vid === window.currentPlayingVideo) {
-                            this.vid.muted = false;
-                        }
-                    }, { once: true });
+                    window.addEventListener('click', () => {
+                        this.vid.muted = false;
+                    });
                 },
-
-                playVideo: function() {
-                    if (this.vid.paused) {
-                        // 全てのビデオを一時停止
-                        this.allVideos.forEach(video => {
-                            if (video !== this.vid) {
-                                video.pause();
-                                video.currentTime = 0;
-                            }
-                        });
-
-                        // 現在のビデオを再生
-                        this.vid.currentTime = 0;
-                        this.vid.play().then(() => {
-                            window.currentPlayingVideo = this.vid;
-                            // 最初はミュートで再生し、少し遅れて音声を有効化
-                            setTimeout(() => {
-                                if (this.vid === window.currentPlayingVideo) {
-                                    this.vid.muted = false;
-                                }
-                            }, 1000);
-                        }).catch(error => {
-                            console.error('Video playback failed:', error);
-                        });
+                handleTap: function(event) {
+                    if (this.vid.paused && this.el.object3D.visible) {
+                        this.playVideo();
                     }
                 },
+                playVideo: function() {
+                    // 全てのビデオを一時停止
+                    this.allVideos.forEach(video => {
+                        if (video !== this.vid) {
+                            video.pause();
+                            video.currentTime = 0;
+                        }
+                    });
 
+                    // 現在のビデオを再生
+                    this.vid.play().catch(error => {
+                        console.error('Video playback failed:', error);
+                    });
+                    window.currentPlayingVideo = this.vid;
+                },
                 pauseVideo: function() {
-                    if (this.vid === window.currentPlayingVideo) {
-                        this.vid.pause();
-                        this.vid.currentTime = 0;
-                        this.vid.muted = true;
+                    this.vid.pause();
+                    if (window.currentPlayingVideo === this.vid) {
                         window.currentPlayingVideo = null;
                     }
                 }
@@ -100,34 +82,27 @@
     </head>
 
     <body style="margin: 0; overflow: hidden;">
-        <button id="backButton" onclick="location.href='index.html'">← 言語選択に戻る</button>
         <a-scene
             vr-mode-ui="enabled: false"
             loading-screen="enabled: false;"
-            arjs='sourceType: webcam; 
-                  debugUIEnabled: false; 
-                  detectionMode: mono_and_matrix; 
-                  matrixCodeType: 3x3; 
-                  patternRatio: 0.80;
-                  sourceWidth:1280; 
-                  sourceHeight:960;
-                  displayWidth: 1280; 
-                  displayHeight: 960;'
+            arjs='sourceType: webcam; debugUIEnabled: false;'
             id="scene"
             embedded
             gesture-detector
         >
             <a-assets>
-                <video id="vid1" src="videos/ja/video1.mp4" preload="auto" loop crossorigin webkit-playsinline playsinline muted></video>
-                <video id="vid2" src="videos/ja/video2.mp4" preload="auto" loop crossorigin webkit-playsinline playsinline muted></video>
-                <video id="vid3" src="videos/ja/video3.mp4" preload="auto" loop crossorigin webkit-playsinline playsinline muted></video>
+                <!-- 3個のビデオアセットを定義 -->
+                <video id="vid1" src="assets/asset1.mp4" preload="auto" loop crossorigin webkit-playsinline playsinline></video>
+                <video id="vid2" src="assets/asset2.mp4" preload="auto" loop crossorigin webkit-playsinline playsinline></video>
+                <video id="vid3" src="assets/asset3.mp4" preload="auto" loop crossorigin webkit-playsinline playsinline></video>
             </a-assets>
 
+            <!-- 3個のマーカーを定義し、それぞれを対応するビデオに関連付け -->
             <a-marker
                 type="pattern"
                 preset="custom"
-                url="markers/pattern-marker1.patt"
-                patternRatio="0.80"
+                url="assets/marker1.patt"
+                patternRatio="0.8"
                 videohandler="videoId: #vid1"
                 id="marker1"
             >
@@ -137,8 +112,8 @@
             <a-marker
                 type="pattern"
                 preset="custom"
-                url="markers/pattern-marker2.patt"
-                patternRatio="0.80"
+                url="assets/marker2.patt"
+                patternRatio="0.8"
                 videohandler="videoId: #vid2"
                 id="marker2"
             >
@@ -148,8 +123,8 @@
             <a-marker
                 type="pattern"
                 preset="custom"
-                url="markers/pattern-marker3.patt"
-                patternRatio="0.80"
+                url="assets/marker3.patt"
+                patternRatio="0.8"
                 videohandler="videoId: #vid3"
                 id="marker3"
             >
