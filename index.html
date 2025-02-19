@@ -1,114 +1,98 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<!DOCTYPE html>
 <html>
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <meta http-equiv="Content-Style-Type" content="text/css">
-  <title></title>
-  <meta name="Generator" content="Cocoa HTML Writer">
-  <meta name="CocoaVersion" content="2487.7">
-  <style type="text/css">
-    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica}
-    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; min-height: 14.0px}
-  </style>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Museum AR Guide - Language Selection</title>
+    <style>
+        body {
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: #000;
+            font-family: Arial, sans-serif;
+        }
+        
+        .language-select {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 2rem;
+            border-radius: 10px;
+            text-align: center;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 2rem;
+        }
+        
+        .language-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            max-width: 600px;
+        }
+        
+        .language-button {
+            padding: 1rem;
+            font-size: 1.2rem;
+            border: none;
+            border-radius: 5px;
+            background: #4CAF50;
+            color: white;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .language-button:hover {
+            background: #45a049;
+        }
+        
+        .language-name {
+            display: block;
+            font-size: 0.8em;
+            margin-top: 0.5em;
+        }
+    </style>
 </head>
 <body>
-<p class="p1">&lt;!DOCTYPE html&gt;</p>
-<p class="p1">&lt;html&gt;</p>
-<p class="p1">&lt;head&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;meta charset="utf-8"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;title&gt;Museum AR Guide - Language Selection&lt;/title&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;style&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>body {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>margin: 0;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>display: flex;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>justify-content: center;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>align-items: center;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>min-height: 100vh;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background: #000;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-family: Arial, sans-serif;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.language-select {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background: rgba(255, 255, 255, 0.9);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>padding: 2rem;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-radius: 10px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>text-align: center;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>h1 {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>color: #333;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>margin-bottom: 2rem;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.language-grid {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>display: grid;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>grid-template-columns: repeat(2, 1fr);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>gap: 1rem;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>max-width: 600px;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.language-button {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>padding: 1rem;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-size: 1.2rem;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border: none;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-radius: 5px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background: #4CAF50;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>color: white;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>cursor: pointer;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>transition: background 0.3s;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.language-button:hover {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background: #45a049;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.language-name {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>display: block;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-size: 0.8em;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>margin-top: 0.5em;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/style&gt;</p>
-<p class="p1">&lt;/head&gt;</p>
-<p class="p1">&lt;body&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="language-select"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;h1&gt;Museum AR Guide&lt;/h1&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="language-grid"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;button class="language-button" onclick="location.href='index_ja.html'"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>日本語</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;span class="language-name"&gt;Japanese&lt;/span&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;/button&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;button class="language-button" onclick="location.href='index_en.html'"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>English</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;span class="language-name"&gt;英語&lt;/span&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;/button&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;button class="language-button" onclick="location.href='index_zh.html'"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>中文</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;span class="language-name"&gt;中国語&lt;/span&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;/button&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;button class="language-button" onclick="location.href='index_ko.html'"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>한국어</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;span class="language-name"&gt;韓国語&lt;/span&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;/button&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;button class="language-button" onclick="location.href='index_es.html'"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>Español</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;span class="language-name"&gt;スペイン語&lt;/span&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;/button&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;button class="language-button" onclick="location.href='index_fr.html'"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>Français</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;span class="language-name"&gt;フランス語&lt;/span&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;/button&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;button class="language-button" onclick="location.href='index_de.html'"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>Deutsch</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;span class="language-name"&gt;ドイツ語&lt;/span&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;/button&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;button class="language-button" onclick="location.href='index_it.html'"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>Italiano</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;span class="language-name"&gt;イタリア語&lt;/span&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;/button&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
-<p class="p1">&lt;/body&gt;</p>
-<p class="p1">&lt;/html&gt;</p>
+    <div class="language-select">
+        <h1>Museum AR Guide</h1>
+        <div class="language-grid">
+            <button class="language-button" onclick="location.href='index_ja.html'">
+                日本語
+                <span class="language-name">Japanese</span>
+            </button>
+            <button class="language-button" onclick="location.href='index_en.html'">
+                English
+                <span class="language-name">英語</span>
+            </button>
+            <button class="language-button" onclick="location.href='index_zh.html'">
+                中文
+                <span class="language-name">中国語</span>
+            </button>
+            <button class="language-button" onclick="location.href='index_ko.html'">
+                한국어
+                <span class="language-name">韓国語</span>
+            </button>
+            <button class="language-button" onclick="location.href='index_es.html'">
+                Español
+                <span class="language-name">スペイン語</span>
+            </button>
+            <button class="language-button" onclick="location.href='index_fr.html'">
+                Français
+                <span class="language-name">フランス語</span>
+            </button>
+            <button class="language-button" onclick="location.href='index_de.html'">
+                Deutsch
+                <span class="language-name">ドイツ語</span>
+            </button>
+            <button class="language-button" onclick="location.href='index_it.html'">
+                Italiano
+                <span class="language-name">イタリア語</span>
+            </button>
+        </div>
+    </div>
 </body>
 </html>
