@@ -58,19 +58,6 @@
             line-height: 1.5;
         }
 
-        .play-indicator {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0, 0, 0, 0.7);
-            color: white;
-            padding: 10px 20px;
-            border-radius: 20px;
-            z-index: 1000;
-            display: none;
-        }
-
         #backButton {
             position: fixed;
             top: 20px;
@@ -89,13 +76,11 @@
 <body>
     <button id="backButton" onclick="location.href='index.html'">← 言語選択に戻る</button>
     <div id="loading">読み込み中...</div>
-    <div id="playIndicator" class="play-indicator">タップして再生</div>
 
     <div id="startUI">
         <h1>Museum AR Guide</h1>
         <div id="instructions">
-            カメラを絵画のマーカーにかざすと、解説動画が表示されます。<br>
-            動画をタップすると再生/一時停止ができます。
+            カメラを絵画のマーカーにかざすと、解説動画が自動的に再生されます。
         </div>
         <button id="startButton">タップして開始</button>
     </div>
@@ -187,7 +172,6 @@
         const startUI = document.getElementById('startUI');
         const startButton = document.getElementById('startButton');
         const loading = document.getElementById('loading');
-        const playIndicator = document.getElementById('playIndicator');
         let loadedVideos = 0;
         const totalVideos = 3;
 
@@ -199,6 +183,12 @@
                 video.playsInline = true;
                 video.setAttribute('playsinline', '');
                 video.setAttribute('webkit-playsinline', '');
+                
+                // エラー処理の追加
+                video.addEventListener('error', function(e) {
+                    console.error('Video error:', e);
+                    onVideoLoaded(); // エラーでもロード完了とみなす
+                });
             });
         }
 
@@ -206,59 +196,53 @@
         document.querySelectorAll('a-marker').forEach(marker => {
             const videoNum = marker.getAttribute('videonum');
             const video = document.querySelector(`#video${videoNum}`);
+            let playAttemptInterval;
             
             marker.addEventListener('markerFound', () => {
                 console.log('Marker found:', videoNum);
-                playIndicator.style.display = 'block';
                 if (video) {
-                    video.muted = true;
-                    video.currentTime = 0;
+                    clearInterval(playAttemptInterval);
+                    
+                    const attemptPlay = () => {
+                        video.muted = true;
+                        video.currentTime = 0;
+                        const playPromise = video.play();
+                        
+                        if (playPromise !== undefined) {
+                            playPromise
+                                .then(() => {
+                                    console.log('Video playing:', videoNum);
+                                    clearInterval(playAttemptInterval);
+                                    setTimeout(() => {
+                                        video.muted = false;
+                                    }, 1000);
+                                })
+                                .catch(error => {
+                                    console.warn('Play attempt failed:', error);
+                                });
+                        }
+                    };
+
+                    attemptPlay();
+                    // 再生が失敗した場合のバックアップとして定期的に再試行
+                    playAttemptInterval = setInterval(attemptPlay, 1000);
                 }
             });
 
             marker.addEventListener('markerLost', () => {
                 if (video) {
+                    clearInterval(playAttemptInterval);
                     video.pause();
-                    playIndicator.style.display = 'none';
+                    video.currentTime = 0;
+                    video.muted = true;
                 }
             });
         });
 
-        // タッチイベントの処理
-        document.addEventListener('touchstart', function(e) {
-            const touch = e.touches[0];
-            const element = document.elementFromPoint(touch.clientX, touch.clientY);
-            const marker = element ? element.closest('a-marker') : null;
-            
-            if (marker) {
-                const videoNum = marker.getAttribute('videonum');
-                const video = document.querySelector(`#video${videoNum}`);
-                
-                if (video) {
-                    if (video.paused) {
-                        video.muted = true;
-                        video.play()
-                            .then(() => {
-                                setTimeout(() => {
-                                    video.muted = false;
-                                    playIndicator.style.display = 'none';
-                                }, 1000);
-                            })
-                            .catch(error => {
-                                console.error('Video play error:', error);
-                                playIndicator.style.display = 'block';
-                            });
-                    } else {
-                        video.pause();
-                        playIndicator.style.display = 'block';
-                    }
-                }
-            }
-        });
-
         function onVideoLoaded() {
             loadedVideos++;
-            if (loadedVideos === totalVideos) {
+            console.log('Video loaded:', loadedVideos);
+            if (loadedVideos >= totalVideos) {
                 loading.style.display = 'none';
                 startUI.classList.add('hidden');
             }
@@ -275,12 +259,18 @@
             // ビデオの読み込みを開始
             const videos = document.querySelectorAll('video');
             videos.forEach(video => {
+                // 既存のイベントリスナーをクリア
+                video.removeEventListener('loadeddata', onVideoLoaded);
+                video.addEventListener('loadeddata', onVideoLoaded, { once: true });
+                
+                // ビデオの読み込みを開始
                 video.load();
             });
 
             // タイムアウト処理
             setTimeout(() => {
                 if (loading.style.display !== 'none') {
+                    console.log('Loading timeout - forcing start');
                     loading.style.display = 'none';
                     startUI.classList.add('hidden');
                 }
@@ -290,9 +280,21 @@
         // 初期化
         document.addEventListener('DOMContentLoaded', () => {
             initializeVideos();
+            
+            // iOS/Safari用の追加初期化
+            const videos = document.querySelectorAll('video');
+            videos.forEach(video => {
+                video.load();
+                video.play().then(() => {
+                    video.pause();
+                    video.currentTime = 0;
+                }).catch(() => {
+                    console.log('Initial play prevented - waiting for user interaction');
+                });
+            });
         });
 
-        // iOS Safari対応
+        // iOS Safari対応の追加処理
         document.addEventListener('touchstart', () => {
             const videos = document.querySelectorAll('video');
             videos.forEach(video => {
