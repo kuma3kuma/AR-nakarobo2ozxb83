@@ -13,52 +13,112 @@
             min-height: 100vh;
             background: #000;
             font-family: Arial, sans-serif;
+            background-image: url('background.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
         }
         
         .language-select {
-            background: rgba(255, 255, 255, 0.9);
+            background: rgba(255, 255, 255, 0.95);
             padding: 2rem;
-            border-radius: 10px;
+            border-radius: 15px;
             text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            max-width: 90%;
+            width: 600px;
+            margin: 20px;
         }
         
         h1 {
             color: #333;
             margin-bottom: 2rem;
+            font-size: 2em;
         }
         
         .language-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 1rem;
-            max-width: 600px;
+            padding: 1rem;
         }
         
         .language-button {
-            padding: 1rem;
+            padding: 1.2rem;
             font-size: 1.2rem;
             border: none;
-            border-radius: 5px;
+            border-radius: 10px;
             background: #4CAF50;
             color: white;
             cursor: pointer;
-            transition: background 0.3s;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
         }
         
         .language-button:hover {
             background: #45a049;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        .language-button:active {
+            transform: translateY(0);
         }
         
         .language-name {
             display: block;
             font-size: 0.8em;
             margin-top: 0.5em;
+            opacity: 0.9;
+        }
+
+        .museum-logo {
+            width: 150px;
+            height: auto;
+            margin-bottom: 1rem;
+        }
+
+        .description {
+            color: #666;
+            margin-bottom: 2rem;
+            font-size: 1.1em;
+            line-height: 1.5;
+            padding: 0 1rem;
+        }
+
+        @media (max-width: 600px) {
+            .language-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .language-button {
+                padding: 1rem;
+                font-size: 1.1rem;
+            }
+            
+            h1 {
+                font-size: 1.5em;
+            }
+            
+            .description {
+                font-size: 1em;
+            }
         }
     </style>
 </head>
 <body>
     <div class="language-select">
+        <img src="museum-logo.png" alt="Museum Logo" class="museum-logo">
         <h1>Museum AR Guide</h1>
+        <p class="description">
+            展示作品の解説をARで体験できます。<br>
+            Experience artwork explanations with AR.<br>
+            请选择语言以体验AR导览。
+        </p>
         <div class="language-grid">
             <button class="language-button" onclick="location.href='index_ja.html'">
                 日本語
