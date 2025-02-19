@@ -1,414 +1,114 @@
-<!DOCTYPE html>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html>
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Museum AR Guide</title>
-    <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
-    <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
-    <style>
-        #startUI {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            color: white;
-            z-index: 999;
-            text-align: center;
-            padding: 20px;
-        }
-        
-        #languageSelect {
-            margin: 20px;
-            padding: 10px;
-            font-size: 1.2em;
-            width: 200px;
-        }
-        
-        #startButton {
-            padding: 15px 30px;
-            font-size: 1.2em;
-            background: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            margin-top: 20px;
-        }
-
-        #loading {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            color: white;
-            z-index: 1000;
-            background: rgba(0, 0, 0, 0.7);
-            padding: 20px;
-            border-radius: 10px;
-            display: none;
-        }
-        
-        .hidden {
-            display: none !important;
-        }
-
-        #instructions {
-            margin: 20px;
-            font-size: 1.1em;
-            line-height: 1.5;
-        }
-
-        .play-indicator {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0, 0, 0, 0.7);
-            color: white;
-            padding: 10px 20px;
-            border-radius: 20px;
-            z-index: 1000;
-            display: none;
-        }
-    </style>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <title></title>
+  <meta name="Generator" content="Cocoa HTML Writer">
+  <meta name="CocoaVersion" content="2487.7">
+  <style type="text/css">
+    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica}
+    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; min-height: 14.0px}
+  </style>
 </head>
 <body>
-    <div id="loading">読み込み中...</div>
-    <div id="playIndicator" class="play-indicator">タップして再生</div>
-
-    <div id="startUI">
-        <h1>Museum AR Guide</h1>
-        <div id="instructions">
-            カメラを絵画のマーカーにかざすと、解説動画が表示されます。
-        </div>
-        <select id="languageSelect">
-            <option value="ja">日本語</option>
-            <option value="en">English</option>
-            <option value="zh">中文</option>
-            <option value="ko">한국어</option>
-            <option value="es">Español</option>
-            <option value="fr">Français</option>
-            <option value="de">Deutsch</option>
-            <option value="it">Italiano</option>
-        </select>
-        <button id="startButton">タップして開始</button>
-    </div>
-
-    <a-scene
-        embedded
-        arjs='sourceType: webcam; debugUIEnabled: false; detectionMode: mono_and_matrix; matrixCodeType: 3x3; patternRatio: 0.80;'
-        vr-mode-ui="enabled: false"
-        renderer="antialias: true; alpha: true"
-    >
-        <a-assets timeout="10000">
-            <video 
-                id="video1" 
-                preload="auto" 
-                loop="true" 
-                crossorigin="anonymous"
-                playsinline 
-                webkit-playsinline
-                muted="true"
-                autoplay="true"
-                style="display: none"
-            ></video>
-            <video 
-                id="video2" 
-                preload="auto" 
-                loop="true" 
-                crossorigin="anonymous"
-                playsinline 
-                webkit-playsinline
-                muted="true"
-                autoplay="true"
-                style="display: none"
-            ></video>
-            <video 
-                id="video3" 
-                preload="auto" 
-                loop="true" 
-                crossorigin="anonymous"
-                playsinline 
-                webkit-playsinline
-                muted="true"
-                autoplay="true"
-                style="display: none"
-            ></video>
-        </a-assets>
-
-        <a-marker type="pattern" url="markers/pattern-marker1.patt" videonum="1">
-            <a-video 
-                src="#video1" 
-                position="0 0 0" 
-                rotation="-90 0 0" 
-                width="2" 
-                height="1.5"
-                material="shader: flat; transparent: true"
-                class="clickable"
-            ></a-video>
-        </a-marker>
-
-        <a-marker type="pattern" url="markers/pattern-marker2.patt" videonum="2">
-            <a-video 
-                src="#video2" 
-                position="0 0 0" 
-                rotation="-90 0 0" 
-                width="2" 
-                height="1.5"
-                material="shader: flat; transparent: true"
-                class="clickable"
-            ></a-video>
-        </a-marker>
-
-        <a-marker type="pattern" url="markers/pattern-marker3.patt" videonum="3">
-            <a-video 
-                src="#video3" 
-                position="0 0 0" 
-                rotation="-90 0 0" 
-                width="2" 
-                height="1.5"
-                material="shader: flat; transparent: true"
-                class="clickable"
-            ></a-video>
-        </a-marker>
-
-        <a-entity camera></a-entity>
-    </a-scene>
-        <script>
-        const startUI = document.getElementById('startUI');
-        const startButton = document.getElementById('startButton');
-        const languageSelect = document.getElementById('languageSelect');
-        const loading = document.getElementById('loading');
-        const instructions = document.getElementById('instructions');
-        const playIndicator = document.getElementById('playIndicator');
-
-        const instructionTexts = {
-            ja: "カメラを絵画のマーカーにかざすと、解説動画が表示されます。",
-            en: "Point your camera at the painting markers to view explanation videos.",
-            zh: "将相机对准画作标记即可观看解说视频。",
-            ko: "카메라를 그림 마커에 비추면 설명 영상이 표시됩니다.",
-            es: "Apunte la cámara a los marcadores de las pinturas para ver videos explicativos.",
-            fr: "Pointez votre caméra vers les marqueurs des peintures pour voir les vidéos explicatives.",
-            de: "Richten Sie die Kamera auf die Gemäldemarkierungen, um Erklärungsvideos anzusehen.",
-            it: "Punta la fotocamera sui marcatori dei dipinti per vedere i video esplicativi."
-        };
-
-        const buttonTexts = {
-            ja: "タップして開始",
-            en: "Tap to Start",
-            zh: "点击开始",
-            ko: "탭하여 시작",
-            es: "Toque para comenzar",
-            fr: "Tapez pour commencer",
-            de: "Tippen zum Starten",
-            it: "Tocca per iniziare"
-        };
-
-        const loadingTexts = {
-            ja: "読み込み中...",
-            en: "Loading...",
-            zh: "加载中...",
-            ko: "로딩중...",
-            es: "Cargando...",
-            fr: "Chargement...",
-            de: "Laden...",
-            it: "Caricamento..."
-        };
-
-        const playIndicatorTexts = {
-            ja: "タップして再生",
-            en: "Tap to Play",
-            zh: "点击播放",
-            ko: "탭하여 재생",
-            es: "Toque para reproducir",
-            fr: "Tapez pour lire",
-            de: "Tippen zum Abspielen",
-            it: "Tocca per riprodurre"
-        };
-
-        const videoSources = {
-            ja: {
-                video1: 'videos/ja/video1.mp4',
-                video2: 'videos/ja/video2.mp4',
-                video3: 'videos/ja/video3.mp4'
-            },
-            en: {
-                video1: 'videos/en/video1.mp4',
-                video2: 'videos/en/video2.mp4',
-                video3: 'videos/en/video3.mp4'
-            },
-            zh: {
-                video1: 'videos/zh/video1.mp4',
-                video2: 'videos/zh/video2.mp4',
-                video3: 'videos/zh/video3.mp4'
-            },
-            ko: {
-                video1: 'videos/ko/video1.mp4',
-                video2: 'videos/ko/video2.mp4',
-                video3: 'videos/ko/video3.mp4'
-            },
-            es: {
-                video1: 'videos/es/video1.mp4',
-                video2: 'videos/es/video2.mp4',
-                video3: 'videos/es/video3.mp4'
-            },
-            fr: {
-                video1: 'videos/fr/video1.mp4',
-                video2: 'videos/fr/video2.mp4',
-                video3: 'videos/fr/video3.mp4'
-            },
-            de: {
-                video1: 'videos/de/video1.mp4',
-                video2: 'videos/de/video2.mp4',
-                video3: 'videos/de/video3.mp4'
-            },
-            it: {
-                video1: 'videos/it/video1.mp4',
-                video2: 'videos/it/video2.mp4',
-                video3: 'videos/it/video3.mp4'
-            }
-        };
-
-        // ビデオの初期化
-        function initializeVideos() {
-            const videos = document.querySelectorAll('video');
-            videos.forEach(video => {
-                video.muted = true;
-                video.playsInline = true;
-                video.setAttribute('playsinline', '');
-                video.setAttribute('webkit-playsinline', '');
-            });
-        }
-
-        // マーカー検出時の処理
-        document.querySelectorAll('a-marker').forEach(marker => {
-            const videoNum = marker.getAttribute('videonum');
-            const video = document.querySelector(`#video${videoNum}`);
-            
-            marker.addEventListener('markerFound', () => {
-                console.log('Marker found:', videoNum);
-                playIndicator.style.display = 'block';
-                if (video) {
-                    video.muted = true;
-                    video.currentTime = 0;
-                }
-            });
-
-            marker.addEventListener('markerLost', () => {
-                if (video) {
-                    video.pause();
-                    playIndicator.style.display = 'none';
-                }
-            });
-        });
-
-        // タッチイベントの処理
-        document.addEventListener('touchstart', function(e) {
-            const touch = e.touches[0];
-            const element = document.elementFromPoint(touch.clientX, touch.clientY);
-            const marker = element ? element.closest('a-marker') : null;
-            
-            if (marker) {
-                const videoNum = marker.getAttribute('videonum');
-                const video = document.querySelector(`#video${videoNum}`);
-                
-                if (video) {
-                    if (video.paused) {
-                        video.muted = true;
-                        video.play()
-                            .then(() => {
-                                setTimeout(() => {
-                                    video.muted = false;
-                                    playIndicator.style.display = 'none';
-                                }, 1000);
-                            })
-                            .catch(error => {
-                                console.error('Video play error:', error);
-                                playIndicator.style.display = 'block';
-                            });
-                    } else {
-                        video.pause();
-                        playIndicator.style.display = 'block';
-                    }
-                }
-            }
-        });
-
-        let loadedVideos = 0;
-        const totalVideos = 3;
-
-        function onVideoLoaded() {
-            loadedVideos++;
-            if (loadedVideos === totalVideos) {
-                loading.style.display = 'none';
-                startUI.classList.add('hidden');
-            }
-        }
-
-        function updateVideoSources(language) {
-            loading.style.display = 'block';
-            loadedVideos = 0;
-            
-            const sources = videoSources[language];
-            const videoElements = document.querySelectorAll('video');
-            
-            videoElements.forEach((video, index) => {
-                const videoId = `video${index + 1}`;
-                video.removeEventListener('loadeddata', onVideoLoaded);
-                video.addEventListener('loadeddata', onVideoLoaded, { once: true });
-                
-                video.muted = true;
-                video.pause();
-                video.currentTime = 0;
-                video.src = sources[videoId];
-                video.load();
-            });
-
-            playIndicator.textContent = playIndicatorTexts[language];
-
-            setTimeout(() => {
-                if (loading.style.display !== 'none') {
-                    loading.style.display = 'none';
-                    startUI.classList.add('hidden');
-                }
-            }, 5000);
-        }
-
-        languageSelect.addEventListener('change', (event) => {
-            const language = event.target.value;
-            instructions.textContent = instructionTexts[language];
-            startButton.textContent = buttonTexts[language];
-            loading.textContent = loadingTexts[language];
-            playIndicator.textContent = playIndicatorTexts[language];
-        });
-
-        startButton.addEventListener('click', () => {
-            const selectedLanguage = languageSelect.value;
-            updateVideoSources(selectedLanguage);
-        });
-
-        // 初期化
-        document.addEventListener('DOMContentLoaded', () => {
-            initializeVideos();
-        });
-
-        // iOS Safari対応
-        document.addEventListener('touchstart', () => {
-            const videos = document.querySelectorAll('video');
-            videos.forEach(video => {
-                video.play().then(() => {
-                    video.pause();
-                    video.currentTime = 0;
-                }).catch(console.error);
-            });
-        }, { once: true });
-    </script>
+<p class="p1">&lt;!DOCTYPE html&gt;</p>
+<p class="p1">&lt;html&gt;</p>
+<p class="p1">&lt;head&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;meta charset="utf-8"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;title&gt;Museum AR Guide - Language Selection&lt;/title&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;style&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>body {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>margin: 0;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>display: flex;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>justify-content: center;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>align-items: center;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>min-height: 100vh;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>background: #000;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>font-family: Arial, sans-serif;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><span class="Apple-converted-space">        </span></p>
+<p class="p1"><span class="Apple-converted-space">        </span>.language-select {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>background: rgba(255, 255, 255, 0.9);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>padding: 2rem;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>border-radius: 10px;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>text-align: center;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><span class="Apple-converted-space">        </span></p>
+<p class="p1"><span class="Apple-converted-space">        </span>h1 {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>color: #333;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>margin-bottom: 2rem;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><span class="Apple-converted-space">        </span></p>
+<p class="p1"><span class="Apple-converted-space">        </span>.language-grid {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>display: grid;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>grid-template-columns: repeat(2, 1fr);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>gap: 1rem;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>max-width: 600px;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><span class="Apple-converted-space">        </span></p>
+<p class="p1"><span class="Apple-converted-space">        </span>.language-button {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>padding: 1rem;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>font-size: 1.2rem;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>border: none;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>border-radius: 5px;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>background: #4CAF50;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>color: white;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>cursor: pointer;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>transition: background 0.3s;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><span class="Apple-converted-space">        </span></p>
+<p class="p1"><span class="Apple-converted-space">        </span>.language-button:hover {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>background: #45a049;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><span class="Apple-converted-space">        </span></p>
+<p class="p1"><span class="Apple-converted-space">        </span>.language-name {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>display: block;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>font-size: 0.8em;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>margin-top: 0.5em;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/style&gt;</p>
+<p class="p1">&lt;/head&gt;</p>
+<p class="p1">&lt;body&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="language-select"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;h1&gt;Museum AR Guide&lt;/h1&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="language-grid"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;button class="language-button" onclick="location.href='index_ja.html'"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>日本語</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;span class="language-name"&gt;Japanese&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;button class="language-button" onclick="location.href='index_en.html'"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>English</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;span class="language-name"&gt;英語&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;button class="language-button" onclick="location.href='index_zh.html'"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>中文</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;span class="language-name"&gt;中国語&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;button class="language-button" onclick="location.href='index_ko.html'"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>한국어</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;span class="language-name"&gt;韓国語&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;button class="language-button" onclick="location.href='index_es.html'"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>Español</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;span class="language-name"&gt;スペイン語&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;button class="language-button" onclick="location.href='index_fr.html'"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>Français</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;span class="language-name"&gt;フランス語&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;button class="language-button" onclick="location.href='index_de.html'"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>Deutsch</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;span class="language-name"&gt;ドイツ語&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;button class="language-button" onclick="location.href='index_it.html'"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>Italiano</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;span class="language-name"&gt;イタリア語&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
+<p class="p1">&lt;/body&gt;</p>
+<p class="p1">&lt;/html&gt;</p>
 </body>
 </html>
