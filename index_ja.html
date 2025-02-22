@@ -1,90 +1,111 @@
-index_ja.html
 <!doctype html>
 <html>
     <head>
-        <!-- A-Frame and AR.js Libraries -->
         <script src="https://aframe.io/releases/1.0.4/aframe.min.js"></script>
         <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
-        <script src="https://raw.githack.com/donmccurdy/aframe-extras/master/dist/aframe-extras.loaders.min.js"></script>
         <script src="https://raw.githack.com/AR-js-org/studio-backend/master/src/modules/marker/tools/gesture-detector.js"></script>
         <script src="https://raw.githack.com/AR-js-org/studio-backend/master/src/modules/marker/tools/gesture-handler.js"></script>
+        <script>
+            AFRAME.registerComponent('videohandler', {
+                schema: {
+                    videoId: { type: 'string' }
+                },
+                init: function () {
+                    var marker = this.el;
+                    this.vid = document.querySelector(this.data.videoId);
+
+                    this.allVideos = document.querySelectorAll('video');
+                    document.body.addEventListener('touchend', this.handleTap.bind(this));
+
+                    if (!window.currentPlayingVideo) {
+                        window.currentPlayingVideo = null;
+                    }
+
+                    if (this.vid.readyState >= 3) {
+                        marker.addEventListener('markerFound', () => {
+                            this.playVideo();
+                        });
+                    } else {
+                        this.vid.addEventListener('loadeddata', () => {
+                            marker.addEventListener('markerFound', () => {
+                                this.playVideo();
+                            });
+                        });
+                    }
+
+                    marker.addEventListener('markerLost', () => {
+                        this.pauseVideo();
+                    });
+
+                    window.addEventListener('click', () => {
+                        this.vid.muted = false;
+                    });
+                },
+                handleTap: function(event) {
+                    if (this.vid.paused && this.el.object3D.visible) {
+                        this.playVideo();
+                    }
+                },
+                playVideo: function() {
+                    this.allVideos.forEach(video => {
+                        if (video !== this.vid) {
+                            video.pause();
+                            video.currentTime = 0;
+                        }
+                    });
+
+                    this.vid.play().catch(error => {
+                        console.error('Video playback failed:', error);
+                    });
+                    window.currentPlayingVideo = this.vid;
+                },
+                pauseVideo: function() {
+                    this.vid.pause();
+                    if (window.currentPlayingVideo === this.vid) {
+                        window.currentPlayingVideo = null;
+                    }
+                }
+            });
+        </script>
     </head>
 
     <body style="margin: 0; overflow: hidden;">
-        <!-- Display "Nakamura Robo Project" -->
-        <h1 style="position: absolute; width: 100%; text-align: center; z-index: 10; color: white; font-size: 2em;">
-            Nakamura Robo Project
-        </h1>
-
         <a-scene
-            vr-mode-ui="enabled: false;"
+            vr-mode-ui="enabled: false"
             loading-screen="enabled: false;"
-            renderer="logarithmicDepthBuffer: true;"
-            arjs="trackingMethod: best; sourceType: webcam; debugUIEnabled: false;"
+            arjs='sourceType: webcam; debugUIEnabled: false;'
             id="scene"
             embedded
             gesture-detector
         >
             <a-assets>
-                <!-- Load GLB assets -->
-                <a-asset-item id="asset1" src="assets/asset1.glb"></a-asset-item>
-                <a-asset-item id="asset2" src="assets/asset2.glb"></a-asset-item>
-                <a-asset-item id="asset3" src="assets/asset3.glb"></a-asset-item>
-                <a-asset-item id="asset4" src="assets/asset4.glb"></a-asset-item>
-
-                <!-- Load MP4 video with iOS compatibility -->
-                <video id="video5" src="assets/videok1.mp4" playsinline loop crossorigin="anonymous"></video>
+                <video id="vid1" src="assets/asset1.mp4" preload="auto" loop crossorigin webkit-playsinline playsinline></video>
+                <video id="vid2" src="assets/asset2.mp4" preload="auto" loop crossorigin webkit-playsinline playsinline></video>
             </a-assets>
 
-            <!-- Marker 1 with GLB asset 1, adjusted offset position -->
-            <a-marker id="marker1" type="pattern" preset="custom" url="assets/marker1.patt" emitevents="true">
-                <a-entity id="model1" position="-0.08 0 0" scale="0.7 0.7 0.7" animation-mixer="loop: repeat" gltf-model="#asset1" gesture-handler></a-entity>
+            <a-marker
+                type="pattern"
+                preset="custom"
+                url="assets/marker1.patt"
+                patternRatio="0.50"
+                videohandler="videoId: #vid1"
+                id="marker1"
+            >
+                <a-video src="#vid1" scale="1 1 1" position="0 0.1 0" rotation="-90 0 0" class="clickable" gesture-handler></a-video>
             </a-marker>
 
-            <!-- Marker 2 with GLB asset 2, adjusted offset position -->
-            <a-marker id="marker2" type="pattern" preset="custom" url="assets/marker2.patt" emitevents="true">
-                <a-entity id="model2" position="0.08 0 0" scale="0.7 0.7 0.7" animation-mixer="loop: repeat" gltf-model="#asset2" gesture-handler></a-entity>
+            <a-marker
+                type="pattern"
+                preset="custom"
+                url="assets/marker2.patt"
+                patternRatio="0.50"
+                videohandler="videoId: #vid2"
+                id="marker2"
+            >
+                <a-video src="#vid2" scale="1 1 1" position="0 0.1 0" rotation="-90 0 0" class="clickable" gesture-handler></a-video>
             </a-marker>
 
-            <!-- Marker 3 with GLB asset 3, adjusted offset position -->
-            <a-marker id="marker3" type="pattern" preset="custom" url="assets/marker3.patt" emitevents="true">
-                <a-entity id="model3" position="0 0.08 0" scale="0.7 0.7 0.7" animation-mixer="loop: repeat" gltf-model="#asset3" gesture-handler></a-entity>
-            </a-marker>
-
-            <!-- Marker 4 with GLB asset 4, adjusted offset position -->
-            <a-marker id="marker4" type="pattern" preset="custom" url="assets/marker4a.patt" emitevents="true">
-                <a-entity id="model4" position="0 -0.08 0" scale="0.7 0.7 0.7" animation-mixer="loop: repeat" gltf-model="#asset4" gesture-handler></a-entity>
-            </a-marker>
-
-            <!-- Marker 5 with MP4 video, Z-axis rotation, user interaction for playback -->
-            <a-marker id="marker5" type="pattern" preset="custom" url="assets/marker5.patt" emitevents="true">
-                <a-video src="#video5" position="0 0 0.1" rotation="0 0 90" width="1.5" height="0.85" scale="1 1 1"></a-video>
-            </a-marker>
-
-            <!-- Camera -->
             <a-entity camera></a-entity>
         </a-scene>
-
-        <script>
-            // Play video on user interaction to enable audio
-            const video = document.getElementById('video5');
-            video.addEventListener('loadeddata', function() {
-                video.play().then(() => {
-                    video.muted = false;
-                    video.volume = 1.0;
-                }).catch(error => {
-                    // User gesture might be required
-                    console.log('User gesture needed to play video');
-                });
-            });
-
-            // In case a user gesture is needed to start video playback
-            document.addEventListener('click', function() {
-                video.play().then(() => {
-                    video.muted = false;
-                    video.volume = 1.0;
-                });
-            });
-        </script>
     </body>
 </html>
